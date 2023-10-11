@@ -11,8 +11,15 @@ namespace Player
         
         [SerializeField] private float groundCheckDistance, wallCheckDistance;
         [SerializeField] private Transform wallCheck, groundCheck;
-        [SerializeField] private LayerMask whatIsGround, whatIsCheck;
-        
+        [SerializeField] private LayerMask whatIsGround, whatIsWall;
+
+        [SerializeField] private float jumpPower = 15f;
+        [SerializeField] private int extraJump = 1;
+
+        private int jumpCount = 0;
+        private bool isGrounded;
+        private float jumpCoolDown;
+
         private int facingDirection, damageDirection;
         private Vector2 movement;
         private bool groundDetected, wallDetected;
@@ -34,17 +41,19 @@ namespace Player
         private void Update()
         {
             UpdateMovingState();
+            UpdateJumoState();
             
             if (Input.GetKeyDown(KeyCode.A))
             {
                 Damage();
             }
 
+            CheckGrounded();
         }
         
         private void UpdateMovingState()
         {
-            wallDetected = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, whatIsGround);
+            wallDetected = Physics2D.Raycast(wallCheck.position, transform.right, wallCheckDistance, whatIsWall);
 
             if(wallDetected)
             {
@@ -54,6 +63,36 @@ namespace Player
             {
                 movement.Set(movementSpeed * facingDirection, aliveRb.velocity.y);
                 aliveRb.velocity = movement;
+            }
+        }
+
+        private void UpdateJumoState()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                if (isGrounded || jumpCount < extraJump)
+                {
+                    aliveRb.velocity = new Vector2(aliveRb.velocity.x, jumpPower);
+                    jumpCount++;
+                }
+            }
+        }
+
+        private void CheckGrounded()
+        {
+            if (Physics2D.OverlapCircle(groundCheck.position, 0.5f, whatIsGround))
+            {
+                isGrounded = true;
+                jumpCount = 0;
+                jumpCoolDown = Time.time + 0.2f;
+            }
+            else if (Time.time < jumpCoolDown)
+            {
+                isGrounded = true;
+            }
+            else
+            {
+                isGrounded = false;
             }
         }
 
