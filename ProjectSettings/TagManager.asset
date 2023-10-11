@@ -41,3 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: WallPaper
+    uniqueID: 3118230939
+    locked: 0
+  - name: Gorund
+    uniqueID: 4231960395
+    locked: 0
+  - name: Player
+    uniqueID: 1940798351
+    locked: 0
