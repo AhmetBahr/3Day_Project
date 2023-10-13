@@ -41,7 +41,6 @@ namespace Data
 
 		public void LoadGame()
 		{
-			// Load any saved data from a file using
 			this._playerData = _fileDataHandler.Load();
 
 			if (this._playerData == null)
@@ -64,7 +63,6 @@ namespace Data
 				dataPersistenceObj.SaveData(ref _playerData);
 			}
 			
-			// save that data to a file using the data handler 
 			_fileDataHandler.Save(_playerData);
 		}
 

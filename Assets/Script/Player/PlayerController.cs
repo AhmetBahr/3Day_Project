@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Player
 {
 	public class PlayerController : MonoBehaviour
 	{
+        public static PlayerController instance { get; private set; }
+        
         public int PlayerHeal;
         [SerializeField] private float movementSpeed;
         
@@ -15,6 +15,8 @@ namespace Player
 
         [SerializeField] private float jumpPower = 15f;
         [SerializeField] private int extraJump = 1;
+
+        private Transform respawnPoint;
 
         private int jumpCount = 0;
         private bool isGrounded;
@@ -27,9 +29,21 @@ namespace Player
         private GameObject alive;
         private Rigidbody2D aliveRb;
         //private Animator aliveAnim;
-        
+
+        private void Awake()
+        {
+            if (instance != null)
+            {
+                Debug.Log("Found more than one PlayerController in the scene");
+
+            }
+
+            instance = this;
+        }
+
         private void Start()
         {
+            respawnPoint = new GameObject().transform;
             alive = transform.Find("PlayerBoudy").gameObject;
             aliveRb = alive.GetComponent<Rigidbody2D>();
          //   aliveAnim = alive.GetComponent<Animator>();
@@ -46,6 +60,10 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.A))
             {
                 Damage();
+            }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                Respawn();
             }
 
             CheckGrounded();
@@ -118,11 +136,31 @@ namespace Player
 
         }
 
+        public void ChangeRespawnPoint(Transform _transform)
+        {
+            respawnPoint.transform.position = _transform.position;
+            print("Changed reSpawn");
+        }
+        
+        public void Respawn()
+        {
+            alive.SetActive(true);
+            alive.transform.position = respawnPoint.transform.position;
+            
+
+        }
+
+        public void PlayerDeath()
+        { 
+            alive.SetActive(false);
+        }
+        
         private void OnDrawGizmos()
         {
             Gizmos.DrawLine(groundCheck.position, new Vector2(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
             Gizmos.DrawLine(wallCheck.position, new Vector2(wallCheck.position.x + wallCheckDistance, wallCheck.position.y));
         }
+        
 	}
 }
 
