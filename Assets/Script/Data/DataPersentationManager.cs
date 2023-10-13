@@ -20,7 +20,7 @@ namespace Data
 		{
 			if (instance != null)
 			{
-				Debug.Log("Found more than  one Data persistence manager in the scene");
+				Debug.Log("Found more than one Data Persistence Manager in the scene");
 			}
 
 			instance = this;
@@ -29,57 +29,56 @@ namespace Data
 		private void Start()
 		{
 			this._fileDataHandler = new FileDataHandler(Application.persistentDataPath, fileName, useEncryption);
-		//	this._dataPersistences = 
-			LoadGame();	
-
+			this._dataPersistences = FindAllDataPersistenceObjects();
+			LoadGame();
 		}
 
 		public void NewGame()
 		{
 			this._playerData = new PlayerData();
+
 		}
 
 		public void LoadGame()
 		{
+			// Load any saved data from a file using
 			this._playerData = _fileDataHandler.Load();
 
 			if (this._playerData == null)
 			{
-				Debug.Log("No data was found");
+				Debug.Log("No data was found.");
 				NewGame();
 			}
-
-			foreach (IDataPersistence dataPersistence in _dataPersistences)
+			//ToDo push the loaded data all other scriots that need it
+			foreach (IDataPersistence dataPersistenceObj in _dataPersistences)
 			{
-				dataPersistence.LoadData(_playerData);
+				dataPersistenceObj.LoadData(_playerData);
 			}
-			
 		}
 
 		public void SaveGame()
 		{
-			foreach (IDataPersistence dataPersistence in _dataPersistences)
+			//ToDo pass the data to other scripts so they can uptade it 
+			foreach (IDataPersistence dataPersistenceObj in _dataPersistences)
 			{
-				dataPersistence.SaveData(ref _playerData);
-				
+				dataPersistenceObj.SaveData(ref _playerData);
 			}
-			_fileDataHandler.Save(_playerData);
 			
+			// save that data to a file using the data handler 
+			_fileDataHandler.Save(_playerData);
 		}
 
-		private void onApplicattionQuit()
+		private void OnApplicationQuit()
 		{
 			SaveGame();
 		}
 
 		private List<IDataPersistence> FindAllDataPersistenceObjects()
 		{
-			IEnumerable<IDataPersistence> dataPersistences =
-				FindObjectsOfType<MonoBehaviour>()
-					.OfType<IDataPersistence>();
-
-
-			return new List<IDataPersistence>(_dataPersistences);
+			IEnumerable<IDataPersistence> dataPersistenceObjects = FindObjectsOfType<MonoBehaviour>()
+				.OfType<IDataPersistence>();
+			
+			return new List<IDataPersistence>(dataPersistenceObjects);
 		}
 	}
 }

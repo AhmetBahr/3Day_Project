@@ -18,8 +18,7 @@ namespace Collectable
 			if (other.CompareTag("Player"))
 			{
 				gameObject.SetActive(false);
-				GameEventManager.instance.onCoinCollected += CoinCollected;
-
+				CoinCollected();
 			}
 		}
 

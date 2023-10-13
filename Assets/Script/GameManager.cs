@@ -20,6 +20,13 @@ namespace Manager
 
 		public int playerCoinGM = 0;
 
+		private void Update()
+		{
+			if (Input.GetKeyDown(KeyCode.X))
+			{
+				print(playerCoinGM);
+			}
+		}
 
 		public void LoadData(PlayerData data)
 		{
