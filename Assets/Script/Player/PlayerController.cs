@@ -6,25 +6,30 @@ namespace Player
 	{
         public static PlayerController instance { get; private set; }
         
-        public int PlayerHeal;
+        [Header("Core Settings")]
         [SerializeField] private float movementSpeed;
         
+        [Header("Check Settings")]
         [SerializeField] private float groundCheckDistance, wallCheckDistance;
         [SerializeField] private Transform wallCheck, groundCheck;
         [SerializeField] private LayerMask whatIsGround, whatIsWall;
 
+        [Header("Jump Settings")]
         [SerializeField] private float jumpPower = 15f;
-        [SerializeField] private int extraJump = 1;
-
-        private Transform respawnPoint;
-
-        private int jumpCount = 0;
-        private bool isGrounded;
+        [SerializeField] private float coyotoTime = 0.25f;
+        private bool doubleJump;
+        private float coyoteTimeCounter;
+        
         private float jumpCoolDown;
 
+        private int PlayerHeal;
         private int facingDirection, damageDirection;
-        private Vector2 movement;
+
+        private bool isGrounded;
         private bool groundDetected, wallDetected;
+        
+        private Transform respawnPoint;
+        private Vector2 movement;
         
         private GameObject alive;
         private Rigidbody2D aliveRb;
@@ -55,8 +60,15 @@ namespace Player
         private void Update()
         {
             UpdateMovingState();
+            CheckCoyoteTime();
             UpdateJumoState();
-            
+
+
+            Buttons();
+        }
+
+        private void Buttons()
+        {
             if (Input.GetKeyDown(KeyCode.A))
             {
                 Damage();
@@ -65,8 +77,7 @@ namespace Player
             {
                 Respawn();
             }
-
-            CheckGrounded();
+            
         }
         
         private void UpdateMovingState()
@@ -86,32 +97,45 @@ namespace Player
 
         private void UpdateJumoState()
         {
+            if (CheckGrounded() && !Input.GetKeyDown(KeyCode.Space))
+            {
+                doubleJump = false;
+            }
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (isGrounded || jumpCount < extraJump)
+
+                if (coyoteTimeCounter > 0 || doubleJump)
                 {
                     aliveRb.velocity = new Vector2(aliveRb.velocity.x, jumpPower);
-                    jumpCount++;
+                    doubleJump = !doubleJump;
                 }
+
+                if (Input.GetKeyDown(KeyCode.Space) && aliveRb.velocity.y > 0f)
+                {
+                    aliveRb.velocity = new Vector2(aliveRb.velocity.x, aliveRb.velocity.y * 0.5f);
+                }
+                
             }
+            
         }
 
-        private void CheckGrounded()
+        private void CheckCoyoteTime()
         {
-            if (Physics2D.OverlapCircle(groundCheck.position, 0.5f, whatIsGround))
+            if (CheckGrounded())
             {
-                isGrounded = true;
-                jumpCount = 0;
-                jumpCoolDown = Time.time + 0.2f;
-            }
-            else if (Time.time < jumpCoolDown)
-            {
-                isGrounded = true;
+                coyoteTimeCounter = coyotoTime;
             }
             else
             {
-                isGrounded = false;
+                coyoteTimeCounter -= Time.deltaTime;
+
             }
+        }
+        
+        private bool CheckGrounded()
+        {
+            return Physics2D.OverlapCircle(groundCheck.position, groundCheckDistance, whatIsGround);
         }
 
         private void EnterDead()

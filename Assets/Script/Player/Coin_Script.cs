@@ -1,5 +1,3 @@
-using System;
-using Data;
 using Manager;
 using UnityEngine;
 
