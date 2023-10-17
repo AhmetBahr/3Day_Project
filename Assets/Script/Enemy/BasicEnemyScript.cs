@@ -9,7 +9,7 @@ namespace Enemy
 		{
 			if (other.CompareTag("Player"))
 			{
-				PlayerController.instance.PlayerDeath();
+			//	PlayerController.instance.PlayerDeath();
 				
 			}
 		}

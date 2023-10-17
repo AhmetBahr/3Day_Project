@@ -9,7 +9,7 @@ namespace Manager
 		{
 			if (other.CompareTag("Player"))
 			{
-				PlayerController.instance.ChangeRespawnPoint(gameObject.transform);
+			//	PlayerController.instance.ChangeRespawnPoint(gameObject.transform);
 			}
 		}
 	}
